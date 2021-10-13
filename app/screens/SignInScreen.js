@@ -1,20 +1,24 @@
 import React from "react";
-import { ImageBackground, StyleSheet, View, Text } from "react-native";
+import { ImageBackground, StyleSheet, View, Text, Button } from "react-native";
 
-function WelcomeScreen(props) {
+const SignInScreen = ({ navigation }) => {
     return (
         <View 
           style={styles.background}
         //   source={require("../assets/background.jpg")}
         >
             <Text >
-                Fuck u bitch
+                SIGN IN
             </Text>
+            <Button
+                title="CUNT"
+                onPress={() => navigation.navigate("Profile")}
+            />
         </View>
-    );
-};
+    )
+}
 
-export default WelcomeScreen;
+export default SignInScreen;
 
 const styles = StyleSheet.create({
     background: {
