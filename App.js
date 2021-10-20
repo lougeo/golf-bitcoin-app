@@ -118,31 +118,34 @@ export default function App() {
   const authContext = React.useMemo(
     () => ({
       signIn: async (data) => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        // In the example, we'll use a dummy token
         console.log(data.username);
         console.log(data.password);
+        let json = { "token": null };
         try {
-          const response = fetch('http://127.0.0.1:8000/api/auth/login/', {
+          fetch('http://192.168.139.220:8000/api/auth/login/', {
             method: 'POST',
             headers: {
-              Accept: 'application/json',
+              // Accept: 'application/json',
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               username: data.username,
               password: data.password
             })
-          });
-          console.log("Maybesuvvess", response);
-          const json = await response.json();
-          console.log("Success", json);
+          })
+            .then(response => response.json())
+            .then(json => {
+              console.log("Success:", json);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+          
+          // console.log("Maybe success", response);
+          // const json = response.json();
+          // console.log("Success", json);
         } catch (error) {
           console.error("ERROR", error);
-        } finally {
-          console.log("FINALLY");
         }
 
         dispatch({ type: ACTIONS.SIGN_IN, token: json.token });
