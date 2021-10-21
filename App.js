@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button, TextInput, Text } from "react-native";
+import { View, Button, TextInput, Text, Alert } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SecureStore from 'expo-secure-store';
@@ -120,35 +120,42 @@ export default function App() {
       signIn: async (data) => {
         console.log(data.username);
         console.log(data.password);
-        let json = { "token": null };
-        try {
-          fetch('http://192.168.139.220:8000/api/auth/login/', {
-            method: 'POST',
-            headers: {
-              // Accept: 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              username: data.username,
-              password: data.password
-            })
+        fetch('http://192.168.139.220:8000/api/auth/login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: data.username,
+            password: data.password
           })
-            .then(response => response.json())
-            .then(json => {
+        })
+          .then(response => response.json())
+          .then(json => {
+            if ("token" in json) {
               console.log("Success:", json);
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-          
-          // console.log("Maybe success", response);
-          // const json = response.json();
-          // console.log("Success", json);
-        } catch (error) {
-          console.error("ERROR", error);
-        }
-
-        dispatch({ type: ACTIONS.SIGN_IN, token: json.token });
+              dispatch({ type: ACTIONS.SIGN_IN, token: json.token });
+            } else {
+              // Invalid username/password. Raise form error.
+              console.log("Invalid", json);
+              Alert.alert(
+                "Bad Data",
+                "Fuck u bitch",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ]
+              );
+            }
+          })
+          .catch((error) => {
+            // Network error, server off or similar.
+            console.error("Error:", error);
+          });
       },
       signOut: () => dispatch({ type: ACTIONS.SIGN_OUT }),
       signUp: async (data) => {
