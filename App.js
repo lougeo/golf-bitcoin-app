@@ -26,8 +26,8 @@ function SplashScreen() {
   );
 }
 
-function SignInScreen() {
-  const [username, setUsername] = React.useState('');
+function SignInScreen({ navigation }) {
+  const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const { signIn } = React.useContext(AuthContext);
@@ -35,9 +35,9 @@ function SignInScreen() {
   return (
     <View>
       <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         placeholder="Password"
@@ -45,7 +45,40 @@ function SignInScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign in" onPress={() => signIn({ username, password })} />
+      <Button title="Sign in" onPress={() => signIn({ email, password })} />
+      <Button title="Register" onPress={() => navigation.navigate("Register")} />
+    </View>
+  );
+}
+
+function RegisterScreen({ navigation }) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [password_confirm, setPasswordConfirm] = React.useState('');
+
+  const { register } = React.useContext(AuthContext);
+
+  return (
+    <View>
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <TextInput
+        placeholder="Confirm Password"
+        value={password_confirm}
+        onChangeText={setPasswordConfirm}
+        secureTextEntry
+      />
+      <Button title="Submit" onPress={() => register({ email, password, password_confirm })} />
+      <Button title="Return" onPress={() => navigation.navigate("SignIn")} />
     </View>
   );
 }
@@ -118,7 +151,7 @@ export default function App() {
   const authContext = React.useMemo(
     () => ({
       signIn: async (data) => {
-        console.log(data.username);
+        console.log(data.email);
         console.log(data.password);
         fetch('http://192.168.139.220:8000/api/auth/login/', {
           method: 'POST',
@@ -126,7 +159,7 @@ export default function App() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            username: data.username,
+            email: data.email,
             password: data.password
           })
         })
@@ -134,9 +167,14 @@ export default function App() {
           .then(json => {
             if ("token" in json) {
               console.log("Success:", json);
+              try {
+                SecureStore.setItemAsync('userToken', json.token);
+              } catch (e) {
+                console.log("FAILED TO SET USERTOKEN")
+              }
               dispatch({ type: ACTIONS.SIGN_IN, token: json.token });
             } else {
-              // Invalid username/password. Raise form error.
+              // Invalid email/password. Raise form error.
               console.log("Invalid", json);
               Alert.alert(
                 "Bad Data",
@@ -157,14 +195,84 @@ export default function App() {
             console.error("Error:", error);
           });
       },
-      signOut: () => dispatch({ type: ACTIONS.SIGN_OUT }),
-      signUp: async (data) => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        // In the example, we'll use a dummy token
+      signOut: async () => {
+        let userToken;
 
-        dispatch({ type: ACTIONS.SIGN_IN, token: 'dummy-auth-token' });
+        try {
+          userToken = await SecureStore.getItemAsync('userToken');
+        } catch (e) {
+          console.log("FAILED TO GET USERTOKEN")
+        }
+        fetch('http://192.168.139.220:8000/api/auth/logout/', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token ' + userToken
+          }
+        })
+          .then(response => {
+            if (response.ok) {
+              try {
+                SecureStore.deleteItemAsync('userToken');
+              } catch (e) {
+                console.log("FAILED TO DELETE USERTOKEN")
+              }
+              dispatch({ type: ACTIONS.SIGN_OUT })
+            } else {
+              console.log("Response error: ", response);
+            }
+          })
+          .catch((error) => {
+            // Network error, server off or similar.
+            console.error("Error:", error);
+          });
+      },
+      register: async (data) => {
+        console.log(data.email);
+        console.log(data.password);
+        console.log(data.password_confirm);
+        fetch('http://192.168.139.220:8000/api/auth/register/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            password_confirm: data.password_confirm,
+          })
+        })
+          .then(response => response.json())
+          .then(json => {
+            if ("token" in json) {
+              console.log("Success:", json);
+              try {
+                SecureStore.setItemAsync('userToken', json.token);
+              } catch (e) {
+                console.log("FAILED TO SET USERTOKEN")
+              }
+              dispatch({ type: ACTIONS.SIGN_IN, token: json.token });
+            } else {
+              // Invalid email/password. Raise form error.
+              console.log("Invalid", json);
+              Alert.alert(
+                "Bad Data",
+                "Fuck u bitch",
+                json,
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ]
+              );
+            }
+          })
+          .catch((error) => {
+            // Network error, server off or similar.
+            console.error("Error:", error);
+          });
       },
     }),
     []
@@ -179,15 +287,24 @@ export default function App() {
             <Stack.Screen name="Splash" component={SplashScreen} />
           ) : state.userToken == null ? (
             // No token found, user isn't signed in
-            <Stack.Screen
-              name="SignIn"
-              component={SignInScreen}
-              options={{
-                title: 'Sign in',
-                // When logging out, a pop animation feels intuitive
-                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
+            <>
+              <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+                options={{
+                  title: 'Sign in',
+                  // When logging out, a pop animation feels intuitive
+                  animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+                }}
+              />
+              <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                options={{
+                  title: 'Register',
+                }}
+              />
+            </>
           ) : (
             // User is signed in
             <Stack.Screen name="Home" component={HomeScreen} />
