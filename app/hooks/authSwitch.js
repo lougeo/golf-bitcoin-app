@@ -15,26 +15,20 @@ function authSwitch(prevState, action) {
     switch (action.type) {
         case ACTIONS.RESTORE_TOKEN:
             return {
-            ...prevState,
-            userToken: action.token,
-            isLoading: false,
+                ...prevState,
+                userToken: action.token,
+                isLoading: false,
             };
         case ACTIONS.SIGN_IN:
             return {
-            ...prevState,
-            isSignout: false,
-            userToken: action.token,
+                ...prevState,
+                isSignout: false,
+                userToken: action.token,
             };
         case ACTIONS.SIGN_OUT:
             return {
-            ...prevState,
-            isSignout: true,
-            userToken: null,
-            };
-        default:
-            return {
-                isLoading: true,
-                isSignout: false,
+                ...prevState,
+                isSignout: true,
                 userToken: null,
             };
     }
