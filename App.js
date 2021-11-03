@@ -5,126 +5,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SecureStore from 'expo-secure-store';
 import { StatusBar } from 'expo-status-bar';
 
-// import RootStackScreen from './app/screens/RootStackNavigator';
-// import ProfileScreen from './app/screens/ProfileScreen';
-// import SignInScreen from './app/screens/SignInScreen';
+import SplashScreen from './app/screens/SplashScreen';
+import SignInScreen from './app/screens/SignInScreen';
+import RegisterScreen from './app/screens/RegisterScreen';
+import HomeScreen from './app/screens/HomeScreen';
+import { AuthContext } from './app/providers/AuthContext';
+import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
 
 
-const AuthContext = React.createContext();
 const Stack = createNativeStackNavigator();
-const ACTIONS = {
-  RESTORE_TOKEN: 'RESTORE_TOKEN',
-  SIGN_IN: 'SIGN_IN',
-  SIGN_OUT: 'SIGN_OUT'
-}
-
-function SplashScreen() {
-  return (
-    <View>
-      <Text>Loading...</Text>
-    </View>
-  );
-}
-
-function SignInScreen({ navigation }) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const { signIn } = React.useContext(AuthContext);
-
-  return (
-    <View>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Sign in" onPress={() => signIn({ email, password })} />
-      <Button title="Register" onPress={() => navigation.navigate("Register")} />
-    </View>
-  );
-}
-
-function RegisterScreen({ navigation }) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [password_confirm, setPasswordConfirm] = React.useState('');
-
-  const { register } = React.useContext(AuthContext);
-
-  return (
-    <View>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        placeholder="Confirm Password"
-        value={password_confirm}
-        onChangeText={setPasswordConfirm}
-        secureTextEntry
-      />
-      <Button title="Submit" onPress={() => register({ email, password, password_confirm })} />
-      <Button title="Return" onPress={() => navigation.navigate("SignIn")} />
-    </View>
-  );
-}
-
-function HomeScreen() {
-  const { signOut } = React.useContext(AuthContext);
-
-  return (
-    <View>
-      <Text>Signed in!</Text>
-      <Button title="Sign out" onPress={signOut} />
-    </View>
-  );
-}
 
 export default function App() {
 
-  const [state, dispatch] = React.useReducer(
-    (prevState, action) => {
-      switch (action.type) {
-        case ACTIONS.RESTORE_TOKEN:
-          return {
-            ...prevState,
-            userToken: action.token,
-            isLoading: false,
-          };
-        case ACTIONS.SIGN_IN:
-          return {
-            ...prevState,
-            isSignout: false,
-            userToken: action.token,
-          };
-        case ACTIONS.SIGN_OUT:
-          return {
-            ...prevState,
-            isSignout: true,
-            userToken: null,
-          };
-      }
-    },
-    {
-      isLoading: true,
-      isSignout: false,
-      userToken: null,
-    }
-  );
+  const [state, dispatch] = React.useReducer(authSwitch, initialState);
   
   React.useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
@@ -281,7 +174,7 @@ export default function App() {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
           {state.isLoading ? (
             // We haven't finished checking for the token yet
             <Stack.Screen name="Splash" component={SplashScreen} />
