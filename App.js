@@ -29,11 +29,35 @@ export default function App() {
       } catch (e) {
         // Restoring token failed
       }
-
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
+      
+      if (userToken) {
+        fetch('http://192.168.48.57:8000/api/auth/token-validation/', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + userToken
+          }
+        })
+          .then(response => response.json())
+          .then(json => {
+            if ("user" in json) {
+              console.log("Success:", json);
+              dispatch({ type: ACTIONS.SIGN_IN, token: userToken });
+            } else {
+              // Invalid token, log user out
+              try {
+                SecureStore.deleteItemAsync('userToken');
+              } catch (e) {
+                console.error("Failed to delete userToken.")
+              }
+              console.log("Invalid", json);
+              dispatch({ type: ACTIONS.SIGN_OUT });
+            }
+          })
+          .catch((error) => {
+            // Network error, server off or similar.
+            console.error("Error:", error);
+          });
+      }
       dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
     };
 
@@ -46,7 +70,7 @@ export default function App() {
       signIn: async (data) => {
         console.log(data.email);
         console.log(data.password);
-        fetch('http://192.168.139.220:8000/api/auth/login/', {
+        fetch('http://192.168.48.57:8000/api/auth/login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -96,7 +120,7 @@ export default function App() {
         } catch (e) {
           console.log("FAILED TO GET USERTOKEN")
         }
-        fetch('http://192.168.139.220:8000/api/auth/logout/', {
+        fetch('http://192.168.48.57:8000/api/auth/logout/', {
           method: 'POST',
           headers: {
             'Authorization': 'Token ' + userToken
@@ -109,7 +133,7 @@ export default function App() {
               } catch (e) {
                 console.log("FAILED TO DELETE USERTOKEN")
               }
-              dispatch({ type: ACTIONS.SIGN_OUT })
+              dispatch({ type: ACTIONS.SIGN_OUT });
             } else {
               console.log("Response error: ", response);
             }
@@ -123,7 +147,7 @@ export default function App() {
         console.log(data.email);
         console.log(data.password);
         console.log(data.password_confirm);
-        fetch('http://192.168.139.220:8000/api/auth/register/', {
+        fetch('http://192.168.48.57:8000/api/auth/register/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
