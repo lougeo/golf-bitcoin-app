@@ -30,7 +30,9 @@ export default function App() {
         // Restoring token failed
       }
       
-      if (userToken) {
+      if (userToken == null) {
+        dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
+      } else {
         fetch('http://192.168.48.57:8000/api/auth/token-validation/', {
           method: 'GET',
           headers: {
@@ -58,7 +60,6 @@ export default function App() {
             console.error("Error:", error);
           });
       }
-      dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
     };
 
     bootstrapAsync();
