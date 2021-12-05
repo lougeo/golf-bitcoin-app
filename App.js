@@ -9,6 +9,7 @@ import SplashScreen from './app/screens/SplashScreen';
 import SignInScreen from './app/screens/SignInScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
 import HomeScreen from './app/screens/HomeScreen';
+import CourseListScreen from './app/screens/CourseList';
 import { AuthContext } from './app/providers/AuthContext';
 import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
 
@@ -43,7 +44,7 @@ export default function App() {
           .then(json => {
             if ("user" in json) {
               console.log("Success:", json);
-              dispatch({ type: ACTIONS.SIGN_IN, token: userToken });
+              dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
             } else {
               // Invalid token, log user out
               try {
@@ -68,9 +69,8 @@ export default function App() {
   
   const authContext = React.useMemo(
     () => ({
+      ...state,
       signIn: async (data) => {
-        console.log(data.email);
-        console.log(data.password);
         fetch('http://192.168.48.57:8000/api/auth/login/', {
           method: 'POST',
           headers: {
@@ -145,9 +145,6 @@ export default function App() {
           });
       },
       register: async (data) => {
-        console.log(data.email);
-        console.log(data.password);
-        console.log(data.password_confirm);
         fetch('http://192.168.48.57:8000/api/auth/register/', {
           method: 'POST',
           headers: {
@@ -193,7 +190,7 @@ export default function App() {
           });
       },
     }),
-    []
+    [state]
   );
   
   return (
@@ -225,7 +222,10 @@ export default function App() {
             </>
           ) : (
             // User is signed in
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="CourseList" component={CourseListScreen} />
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
