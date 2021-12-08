@@ -1,14 +1,18 @@
 import React from "react";
-import { StyleSheet, View, Button, TextInput, Text, FlatList } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, Button, TextInput, Text, FlatList } from "react-native";
 import { AuthContext } from '../providers/AuthContext';
+import { base_url } from "../Globals";
 
 
 function CourseListScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
   const [courses, setCourses] = React.useState('');
 
+  // * NOTE * SWR for async api fetching
+
   React.useEffect(() => {
-    fetch('http://192.168.48.57:8000/api/courses/', {
+    fetch(base_url + 'api/courses/', {
       method: 'GET',
       headers: {
         'Authorization': 'Token ' + userToken
@@ -16,6 +20,7 @@ function CourseListScreen({ navigation }) {
     })
       .then(response => response.json())
       .then(json => {
+        console.log(json);
         setCourses(json);
       })
       .catch((error) => {
@@ -25,11 +30,11 @@ function CourseListScreen({ navigation }) {
   }, []);
 
   return (
-    <View>
+    <SafeAreaView>
       <Text>COURSE LIST</Text>
       <FlatList data={courses} renderItem={({ item }) => <Text>{item.name}</Text>} />
       <Button title="Add Course" />
-    </View>
+    </SafeAreaView>
   );
 }
 

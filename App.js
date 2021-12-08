@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Button, TextInput, Text, Alert } from "react-native";
+import { Alert } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SecureStore from 'expo-secure-store';
-import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import SplashScreen from './app/screens/SplashScreen';
 import SignInScreen from './app/screens/SignInScreen';
@@ -12,6 +12,7 @@ import HomeScreen from './app/screens/HomeScreen';
 import CourseListScreen from './app/screens/CourseList';
 import { AuthContext } from './app/providers/AuthContext';
 import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
+import { base_url } from './app/Globals';
 
 
 const Stack = createNativeStackNavigator();
@@ -34,7 +35,7 @@ export default function App() {
       if (userToken == null) {
         dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
       } else {
-        fetch('http://192.168.48.57:8000/api/auth/token-validation/', {
+        fetch(base_url + 'api/auth/token-validation/', {
           method: 'GET',
           headers: {
             'Authorization': 'Token ' + userToken
@@ -64,14 +65,13 @@ export default function App() {
     };
 
     bootstrapAsync();
-    // NOTE: Empty array here means that it only runs on mount, because it's not listening for anything.
   }, []);
   
   const authContext = React.useMemo(
     () => ({
       ...state,
       signIn: async (data) => {
-        fetch('http://192.168.48.57:8000/api/auth/login/', {
+        fetch(base_url + 'api/auth/login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ export default function App() {
         } catch (e) {
           console.log("FAILED TO GET USERTOKEN")
         }
-        fetch('http://192.168.48.57:8000/api/auth/logout/', {
+        fetch(base_url + 'api/auth/logout/', {
           method: 'POST',
           headers: {
             'Authorization': 'Token ' + userToken
@@ -145,7 +145,7 @@ export default function App() {
           });
       },
       register: async (data) => {
-        fetch('http://192.168.48.57:8000/api/auth/register/', {
+        fetch(base_url + 'api/auth/register/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -195,40 +195,42 @@ export default function App() {
   
   return (
     <AuthContext.Provider value={authContext}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-          {state.isLoading ? (
-            // We haven't finished checking for the token yet
-            <Stack.Screen name="Splash" component={SplashScreen} />
-          ) : state.userToken == null ? (
-            // No token found, user isn't signed in
-            <>
-              <Stack.Screen
-                name="SignIn"
-                component={SignInScreen}
-                options={{
-                  title: 'Sign in',
-                  // When logging out, a pop animation feels intuitive
-                  animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-                }}
-              />
-              <Stack.Screen
-                name="Register"
-                component={RegisterScreen}
-                options={{
-                  title: 'Register',
-                }}
-              />
-            </>
-          ) : (
-            // User is signed in
-            <>
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="CourseList" component={CourseListScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{headerShown: false}}>
+            {state.isLoading ? (
+              // We haven't finished checking for the token yet
+              <Stack.Screen name="Splash" component={SplashScreen} />
+            ) : state.userToken == null ? (
+              // No token found, user isn't signed in
+              <>
+                <Stack.Screen
+                  name="SignIn"
+                  component={SignInScreen}
+                  options={{
+                    title: 'Sign in',
+                    // When logging out, a pop animation feels intuitive
+                    animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+                  }}
+                />
+                <Stack.Screen
+                  name="Register"
+                  component={RegisterScreen}
+                  options={{
+                    title: 'Register',
+                  }}
+                />
+              </>
+            ) : (
+              // User is signed in
+              <>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="CourseList" component={CourseListScreen} />
+              </>
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </AuthContext.Provider>
   );
 }

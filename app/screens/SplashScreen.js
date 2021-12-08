@@ -1,11 +1,12 @@
 import React from "react";
-import { ImageBackground, StyleSheet, View, Text, Button } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ImageBackground, StyleSheet, Text, Button } from "react-native";
 
 function SplashScreen() {
   return (
-    <View>
+    <SafeAreaView>
       <Text>Loading...</Text>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, View, Button, TextInput } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, Button, TextInput } from "react-native";
 import { AuthContext } from '../providers/AuthContext';
 
 
@@ -10,7 +11,7 @@ function SignInScreen({ navigation }) {
   const { signIn } = React.useContext(AuthContext);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TextInput
         placeholder="Email"
         value={email}
@@ -24,7 +25,7 @@ function SignInScreen({ navigation }) {
       />
       <Button title="Sign in" onPress={() => signIn({ email, password })} />
       <Button title="Register" onPress={() => navigation.navigate("Register")} />
-    </View>
+    </SafeAreaView>
   );
 }
 
