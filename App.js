@@ -30,6 +30,7 @@ export default function App() {
         userToken = await SecureStore.getItemAsync('userToken');
       } catch (e) {
         // Restoring token failed
+        userToken = null;
       }
       
       if (userToken == null) {
@@ -44,22 +45,22 @@ export default function App() {
           .then(response => response.json())
           .then(json => {
             if ("user" in json) {
-              console.log("Success:", json);
+              // Success
               dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
             } else {
               // Invalid token, log user out
               try {
                 SecureStore.deleteItemAsync('userToken');
               } catch (e) {
-                console.error("Failed to delete userToken.")
+                console.error(e)
               }
-              console.log("Invalid", json);
-              dispatch({ type: ACTIONS.SIGN_OUT });
+
+              dispatch({ type: ACTIONS.RESTORE_TOKEN, token: null });
             }
           })
           .catch((error) => {
             // Network error, server off or similar.
-            console.error("Error:", error);
+            dispatch({ type: ACTIONS.RESTORE_TOKEN, token: null });
           });
       }
     };
