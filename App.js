@@ -10,6 +10,7 @@ import SignInScreen from './app/screens/SignInScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
 import HomeScreen from './app/screens/HomeScreen';
 import CourseListScreen from './app/screens/CourseList';
+import CourseDetailScreen from './app/screens/CourseDetail';
 import { AuthContext } from './app/providers/AuthContext';
 import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
 import { base_url } from './app/Globals';
@@ -227,6 +228,7 @@ export default function App() {
               <>
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="CourseList" component={CourseListScreen} />
+                <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
               </>
             )}
           </Stack.Navigator>
