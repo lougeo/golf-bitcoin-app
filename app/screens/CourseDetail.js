@@ -1,13 +1,13 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, View, TextInput, Text, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TextInput, Text, FlatList, TouchableOpacity, ScrollView } from "react-native";
 import { AuthContext } from '../providers/AuthContext';
 import { base_url } from "../Globals";
 
 
 function CourseDetailScreen({ route, navigation }) {
   const { userToken } = React.useContext(AuthContext);
-  const [course, setCourse] = React.useState('');
+  const [course, setCourse] = React.useState({id: "", name: "", scorecards: []});
   const course_id = route.params.id;
 
   React.useEffect(() => {
@@ -19,6 +19,7 @@ function CourseDetailScreen({ route, navigation }) {
     })
       .then(response => response.json())
       .then(json => {
+        console.log(json);
         setCourse(json);
       })
       .catch((error) => {
@@ -27,24 +28,47 @@ function CourseDetailScreen({ route, navigation }) {
       });
   }, [course_id]);
 
-  const update = () => {
-    // fetch put name
-    //.then
-      setCourse()
-  }
-
   return (
     <SafeAreaView>
 
-      <Text style={styles.title}>{course.name || course.id}</Text>
+      <View style={styles.titleWrap}>
+        <Text style={styles.title}>{course.name || course.id}</Text>
+      </View>
+      
+      <FlatList
+        data={course.scorecards}
+        renderItem={({ item }) => (
+          <View>
+            <Text style={styles.subtitle}>{item.title}</Text>
+            <ScrollView horizontal>
+              <View>
+                <View style={styles.tableCell}><Text style={styles.tableHeader}>Hole</Text></View>
+                <View style={styles.tableCell}><Text style={styles.tableHeader}>Par</Text></View>
+                <View style={styles.tableCell}><Text style={styles.tableHeader}>Distance</Text></View>
+                <View style={styles.tableCell}><Text style={styles.tableHeader}>Handicap</Text></View>
+              </View>
+              {item.scorecard_holes.map((data) => (
+                <View>
+                  <View style={styles.tableCell}><Text style={styles.tableData}>{data.number}</Text></View>
+                  <View style={styles.tableCell}><Text style={styles.tableData}>{data.par}</Text></View>
+                  <View style={styles.tableCell}><Text style={styles.tableData}>{data.distance}</Text></View>
+                  <View style={styles.tableCell}><Text style={styles.tableData}>{data.handicap}</Text></View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      />
 
-      <TouchableOpacity style={styles.addBtn}>
-        <Text style={styles.actionBtnText}>MODIFY</Text>
-      </TouchableOpacity>
-          
-      <TouchableOpacity style={styles.addBtn}>
-        <Text style={styles.actionBtnText}>DELETE</Text>
-      </TouchableOpacity>
+      <View style={styles.addBtnWrap}>
+        <TouchableOpacity style={styles.addBtn}>
+          <Text style={styles.actionBtnText}>MODIFY</Text>
+        </TouchableOpacity>
+            
+        <TouchableOpacity style={styles.addBtn}>
+          <Text style={styles.actionBtnText}>DELETE</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -65,8 +89,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
 
+  titleWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   title: {
-    fontSize: 32,
+    fontSize: 35,
+    marginVertical: 25,
+  },
+
+  subtitle: {
+    fontSize: 28,
+    marginVertical: 15,
+  },
+
+  tableCell: {
+    width: 150,
+  },
+
+  tableHeader: {
+    fontSize: 20,
+  },
+
+  tableData: {
+    fontSize: 20,
   },
 
   inputView: {
@@ -83,12 +130,15 @@ const styles = StyleSheet.create({
     color: "white",
     flex: 1,
   },
+
+  addBtnWrap: {
+    alignSelf: "flex-end",
+    position: "absolute",
+    bottom: 150,
+    right: 10,
+  },
  
   addBtn: {
-    // alignSelf: "flex-end",
-    // position: "absolute",
-    // bottom: 0,
-    // right: 10,
     height: 100,
     width: 100,
     borderRadius: 50,
