@@ -43,10 +43,9 @@ function CourseListScreen({ navigation }) {
 
       <FlatList
         data={courses}
-        // onPress={() => navigation.navigate("CourseDetail")}
-        renderItem={({ item, onPress, backgroundColor, textColor }) => (
-          <TouchableOpacity onPress={() => navigation.navigate("CourseDetail", {id: item.id})} style={[styles.item, backgroundColor]}>
-            <Text style={[styles.title, textColor]}>{item.name}</Text>
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => navigation.navigate("CourseDetail", {id: item.id})} style={styles.item}>
+            <Text style={styles.title}>{item.name}</Text>
           </TouchableOpacity>
         )}
       />
