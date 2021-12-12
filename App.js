@@ -8,15 +8,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from './app/screens/SplashScreen';
 import SignInScreen from './app/screens/SignInScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
-import HomeScreen from './app/screens/HomeScreen';
 import CourseListScreen from './app/screens/CourseList';
 import CourseDetailScreen from './app/screens/CourseDetail';
 import { AuthContext } from './app/providers/AuthContext';
 import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
 import { base_url } from './app/Globals';
 
+import Root from './app/screens/RootStackNavigator';
+
 
 const Stack = createNativeStackNavigator();
+
 
 export default function App() {
 
@@ -225,8 +227,9 @@ export default function App() {
               </>
             ) : (
               // User is signed in
+              // Start on a bottom tab navigation, and then on if clicked on a thing, go out of that and have a back button that goes back to initial tab nav
               <>
-                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Root" component={Root} />
                 <Stack.Screen name="CourseList" component={CourseListScreen} />
                 <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
               </>
