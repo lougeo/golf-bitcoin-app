@@ -43,6 +43,7 @@ function CourseListScreen({ navigation }) {
 
       <FlatList
         data={courses}
+        keyExtractor={(item, index) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => navigation.navigate("CourseDetail", {id: item.id})} style={styles.item}>
             <Text style={styles.title}>{item.name}</Text>
