@@ -15,10 +15,6 @@ function HomeScreen({ navigation }) {
         <Text style={styles.actionBtnText}>COURSES</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.actionBtn, {backgroundColor: "#cfcdcb"}]} onPress={signOut}>
-        <Text style={[styles.actionBtnText, {color: "black"}]}>SIGN OUT</Text>
-      </TouchableOpacity>
-
     </SafeAreaView>
   );
 }
