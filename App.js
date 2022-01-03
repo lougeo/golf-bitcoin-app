@@ -47,7 +47,8 @@ export default function App() {
         })
           .then(response => {
             if (response.ok) {
-              return response.json()
+              // Success
+              dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
             } else {
               // Invalid token, log user out
               try {
@@ -58,11 +59,6 @@ export default function App() {
 
               dispatch({ type: ACTIONS.RESTORE_TOKEN, token: null });
             }
-            response.json()
-          })
-          .then(json => {
-            // Success
-            dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
           })
           .catch((error) => {
             // Network error, server off or similar.
