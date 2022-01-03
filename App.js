@@ -39,7 +39,7 @@ export default function App() {
       if (userToken == null) {
         dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
       } else {
-        fetch(base_url + 'api/auth/token-validation/', {
+        fetch(base_url + 'api/auth/user/', {
           method: 'GET',
           headers: {
             'Authorization': 'Token ' + userToken
