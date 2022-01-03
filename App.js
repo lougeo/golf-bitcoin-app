@@ -45,11 +45,9 @@ export default function App() {
             'Authorization': 'Token ' + userToken
           }
         })
-          .then(response => response.json())
-          .then(json => {
-            if ("user" in json) {
-              // Success
-              dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
+          .then(response => {
+            if (response.ok) {
+              return response.json()
             } else {
               // Invalid token, log user out
               try {
@@ -60,6 +58,11 @@ export default function App() {
 
               dispatch({ type: ACTIONS.RESTORE_TOKEN, token: null });
             }
+            response.json()
+          })
+          .then(json => {
+            // Success
+            dispatch({ type: ACTIONS.RESTORE_TOKEN, token: userToken });
           })
           .catch((error) => {
             // Network error, server off or similar.
