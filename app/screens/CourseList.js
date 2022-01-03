@@ -9,12 +9,10 @@ import { base_url } from "../Globals";
 function CourseListScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
   const [courses, setCourses] = React.useState('');
-  const [selectedId, setSelectedId] = React.useState(null);
-
-  // * NOTE * SWR for async api fetching
+  const [qs_name, setQSName] = React.useState('');
 
   React.useEffect(() => {
-    fetch(base_url + 'api/courses/', {
+    fetch(base_url + 'api/courses/?name=' + qs_name, {
       method: 'GET',
       headers: {
         'Authorization': 'Token ' + userToken
@@ -28,7 +26,7 @@ function CourseListScreen({ navigation }) {
         // Network error, server off or similar.
         console.error(error);
       });
-  }, []);
+  }, [qs_name]);
 
   return (
     <SafeAreaView>
@@ -37,8 +35,8 @@ function CourseListScreen({ navigation }) {
         lightTheme="true"
         // style={styles.inputView}
         placeholder="Search"
-        // value={email}
-        // onChangeText={setEmail}
+        onChangeText={setQSName}
+        value={qs_name}
       />
 
       <FlatList
@@ -51,9 +49,6 @@ function CourseListScreen({ navigation }) {
         )}
       />
 
-      <TouchableOpacity style={styles.addBtn}>
-        <Text style={styles.actionBtnText}>ADD</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
