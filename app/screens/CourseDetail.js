@@ -19,7 +19,6 @@ function CourseDetailScreen({ route, navigation }) {
     })
       .then(response => response.json())
       .then(json => {
-        console.log(json);
         setCourse(json);
       })
       .catch((error) => {
@@ -29,7 +28,7 @@ function CourseDetailScreen({ route, navigation }) {
   }, [course_id]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.flcontainer}>
 
       <View style={styles.titleWrap}>
         <Text style={styles.title}>{course.name || course.id}</Text>
@@ -66,7 +65,7 @@ function CourseDetailScreen({ route, navigation }) {
           <Text style={styles.actionBtnText}>MODIFY</Text>
         </TouchableOpacity>
             
-        <TouchableOpacity style={styles.addBtn}>
+        <TouchableOpacity style={styles.addBtnDanger}>
           <Text style={styles.actionBtnText}>DELETE</Text>
         </TouchableOpacity>
       </View>
@@ -75,6 +74,10 @@ function CourseDetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  flcontainer: {
+    flex: 1,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -133,19 +136,33 @@ const styles = StyleSheet.create({
   },
 
   addBtnWrap: {
-    alignSelf: "flex-end",
-    position: "absolute",
-    bottom: 150,
-    right: 10,
+    // alignSelf: "flex-end",
+    // position: "absolute",
+    // bottom: 150,
+    // right: 10,
+    flexDirection: 'row',
+    // flex: 2,
+    // alignItems: 'baseline',
+    justifyContent: 'center',
   },
  
+
   addBtn: {
-    height: 100,
-    width: 100,
-    borderRadius: 50,
+    width: "50%",
+    // borderRadius: 25,
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#025b0e",
+  },
+
+  addBtnDanger: {
+    width: "50%",
+    // borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "red",
   },
 
   actionBtnText: {
