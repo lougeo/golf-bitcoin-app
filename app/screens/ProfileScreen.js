@@ -7,10 +7,10 @@ import { base_url } from "../Globals";
 
 function ProfileScreen({ route, navigation }) {
   const { userToken } = React.useContext(AuthContext);
-  const [user, setUser] = React.useState({id: "", name: "", email: ""});
+  const [user, setUser] = React.useState({id: "", first_name: "", email: ""});
 
   React.useEffect(() => {
-    fetch(base_url + `api/user/`, {
+    fetch(base_url + `api/auth/user/`, {
       method: 'GET',
       headers: {
         'Authorization': 'Token ' + userToken
@@ -19,7 +19,7 @@ function ProfileScreen({ route, navigation }) {
       .then(response => response.json())
       .then(json => {
         console.log(json);
-        setCourse(json);
+        setUser(json);
       })
       .catch((error) => {
         // Network error, server off or similar.
@@ -31,18 +31,16 @@ function ProfileScreen({ route, navigation }) {
     <SafeAreaView>
 
       <View style={styles.titleWrap}>
-        <Text style={styles.title}>{user.name || user.id}</Text>
+        <Text style={styles.title}>{user.first_name || user.id}</Text>
       </View>
 
-      <View style={styles.addBtnWrap}>
-        <TouchableOpacity style={styles.addBtn}>
-          <Text style={styles.actionBtnText}>MODIFY</Text>
-        </TouchableOpacity>
-            
-        <TouchableOpacity style={styles.addBtn}>
-          <Text style={styles.actionBtnText}>DELETE</Text>
+
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.actionBtn}>
+          <Text style={styles.actionBtnText}>Friends</Text>
         </TouchableOpacity>
       </View>
+
     </SafeAreaView>
   );
 }
@@ -118,6 +116,16 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#025b0e",
+  },
+
+  actionBtn: {
+    width: "80%",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 40,
     backgroundColor: "#025b0e",
   },
 
