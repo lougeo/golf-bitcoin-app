@@ -9,34 +9,53 @@ import { base_url } from "../Globals";
 function CourseListScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
   const [courses, setCourses] = React.useState('');
-  const [qs_name, setQSName] = React.useState('');
+  const [params, setParams] = React.useState({ qs_name: '', page: '1', next: null });
+
+  const _handleGetMore = () => {
+    if (params.next) {
+      setParams({ ...params, page: (parseInt(params.page) + 1).toString()});
+    }
+  };
+
+  const _handleSearch = (search) => {
+    setParams({ ...params, qs_name: search, page: '1' });
+  }
 
   React.useEffect(() => {
-    fetch(base_url + 'api/courses/?name=' + qs_name, {
+    fetch(base_url + 'api/courses/?name=' + params.qs_name + '&page=' + params.page, {
       method: 'GET',
       headers: {
         'Authorization': 'Token ' + userToken
       }
     })
-      .then(response => response.json())
+      .then(response => response.ok ? response.json() : null)
       .then(json => {
-        setCourses(json);
+        if (json) {
+          let new_courses = courses;
+          if (courses && parseInt(params.page) > 1) {
+            new_courses.push(...json.results);
+          } else {
+            new_courses = json.results;
+          }
+          setCourses(new_courses);
+          setParams({ ...params, next: json.next });
+        }
       })
       .catch((error) => {
         // Network error, server off or similar.
         console.error(error);
       });
-  }, [qs_name]);
+  }, [params.qs_name, params.page]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.flcontainer}>
       
       <SearchBar
         lightTheme="true"
         // style={styles.inputView}
         placeholder="Search"
-        onChangeText={setQSName}
-        value={qs_name}
+        onChangeText={_handleSearch}
+        value={params.qs_name}
       />
 
       <FlatList
@@ -47,6 +66,9 @@ function CourseListScreen({ navigation }) {
             <Text style={styles.title}>{item.name}</Text>
           </TouchableOpacity>
         )}
+        initialNumToRender={8}
+        onEndReachedThreshold={1}
+        onEndReached={_handleGetMore}
       />
 
     </SafeAreaView>
@@ -54,6 +76,10 @@ function CourseListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  flcontainer: {
+    flex: 1,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
