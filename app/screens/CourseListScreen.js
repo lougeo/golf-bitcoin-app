@@ -9,7 +9,7 @@ import { base_url } from "../Globals";
 function CourseListScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
   const [courses, setCourses] = React.useState('');
-  const [params, setParams] = React.useState({ qs_name: '', page: '1', next: null });
+  const [params, setParams] = React.useState({ search: '', page: '1', next: null });
 
   const _handleGetMore = () => {
     if (params.next) {
@@ -17,12 +17,12 @@ function CourseListScreen({ navigation }) {
     }
   };
 
-  const _handleSearch = (search) => {
-    setParams({ ...params, qs_name: search, page: '1' });
+  const _handleSearch = (input) => {
+    setParams({ ...params, search: input, page: '1' });
   }
 
   React.useEffect(() => {
-    fetch(base_url + 'api/courses/?name=' + params.qs_name + '&page=' + params.page, {
+    fetch(base_url + 'api/courses/?name=' + params.search + '&page=' + params.page, {
       method: 'GET',
       headers: {
         'Authorization': 'Token ' + userToken
@@ -45,7 +45,7 @@ function CourseListScreen({ navigation }) {
         // Network error, server off or similar.
         console.error(error);
       });
-  }, [params.qs_name, params.page]);
+  }, [params.search, params.page]);
 
   return (
     <SafeAreaView style={styles.flcontainer}>
@@ -55,7 +55,7 @@ function CourseListScreen({ navigation }) {
         // style={styles.inputView}
         placeholder="Search"
         onChangeText={_handleSearch}
-        value={params.qs_name}
+        value={params.search}
       />
 
       <FlatList
