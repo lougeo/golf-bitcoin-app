@@ -39,7 +39,7 @@ function ProfileScreen({ route, navigation }) {
         <Text style={styles.actionBtnText}>Friends</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionBtn}>
+      <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate("UserList")}>
         <Text style={styles.actionBtnText}>Add Friends</Text>
       </TouchableOpacity>
 
