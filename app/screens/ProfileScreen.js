@@ -28,18 +28,20 @@ function ProfileScreen({ route, navigation }) {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
 
       <View style={styles.titleWrap}>
         <Text style={styles.title}>{user.first_name || user.id}</Text>
       </View>
 
 
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.actionBtn}>
-          <Text style={styles.actionBtnText}>Friends</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.actionBtn}>
+        <Text style={styles.actionBtnText}>Friends</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.actionBtn}>
+        <Text style={styles.actionBtnText}>Add Friends</Text>
+      </TouchableOpacity>
 
     </SafeAreaView>
   );
@@ -103,29 +105,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  addBtnWrap: {
-    alignSelf: "flex-end",
-    position: "absolute",
-    bottom: 150,
-    right: 10,
-  },
- 
-  addBtn: {
-    height: 100,
-    width: 100,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#025b0e",
-  },
-
   actionBtn: {
     width: "80%",
     borderRadius: 25,
     height: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 40,
+    marginTop: 20,
     backgroundColor: "#025b0e",
   },
 
