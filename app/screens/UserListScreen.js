@@ -1,7 +1,8 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, View, TextInput, Text, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TextInput, Text, FlatList, TouchableOpacity, Button } from "react-native";
 import { SearchBar } from "react-native-elements";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { AuthContext } from '../providers/AuthContext';
 import { base_url } from "../Globals";
 
@@ -19,6 +20,32 @@ function UserListScreen({ navigation }) {
 
   const _handleSearch = (input) => {
     setParams({ ...params, search: input, page: '1' });
+  }
+
+  const _addFriend = (receiver_id, is_friend, has_pending_request) => {
+    if (!is_friend && !has_pending_request) {
+      fetch(base_url + 'api/friendrequests/', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Token ' + userToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          receiver: receiver_id
+        })
+      })
+        .then(response => {
+          if (response.ok) {
+            console.log("success");
+          } else {
+            console.log("Error");
+          }
+        })
+        .catch((error) => {
+          // Network error, server off or similar.
+          console.error(error);
+        });
+    }
   }
 
   React.useEffect(() => {
@@ -64,7 +91,23 @@ function UserListScreen({ navigation }) {
         keyExtractor={(item, index) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.item}>
-            <Text style={styles.title}>{item.email}</Text>
+            <View style={{flex: 1, flexDirection: "row", justifyContent: "space-between"}}>
+              <View style={{ flex: 4 }}>
+                {item.first_name ? <Text style={styles.listTitle}>{item.first_name} {item.last_name}</Text> : null}
+                <Text style={styles.listTitle}>{item.email}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => _addFriend(item.id, item.is_friend, item.has_pending_request)}
+              >
+                {
+                  item.is_friend ? <Ionicons name={"checkbox"} size={40} color={"white"} />
+                    : item.has_pending_request ? <Ionicons name={"mail-outline"} size={40} color={"white"} />
+                    : <Ionicons name={"person-add"} size={40} color={"white"} />
+                }
+              </TouchableOpacity>
+            </View>
           </TouchableOpacity>
         )}
         initialNumToRender={8}
@@ -96,8 +139,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
 
-  title: {
-    fontSize: 32,
+  listTitle: {
+    fontSize: 20,
   },
 
   inputView: {
