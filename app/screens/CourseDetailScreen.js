@@ -36,7 +36,7 @@ function CourseDetailScreen({ route, navigation }) {
       
       <FlatList
         data={course.scorecards}
-        keyExtractor={item => item.id}
+        keyExtractor={item => parseInt(item.id)}
         renderItem={({ item }) => (
           <View>
             <Text style={styles.subtitle}>{item.title}</Text>
