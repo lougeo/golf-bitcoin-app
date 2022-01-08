@@ -10,6 +10,7 @@ import { base_url } from "../Globals";
 function UserListScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
   const [users, setUsers] = React.useState('');
+  const [selectedUser, setSelectedUser] = React.useState('');
   const [params, setParams] = React.useState({ search: '', page: '1', next: null });
 
   const _handleGetMore = () => {
@@ -22,7 +23,8 @@ function UserListScreen({ navigation }) {
     setParams({ ...params, search: input, page: '1' });
   }
 
-  const _addFriend = (receiver_id, is_friend, has_pending_request) => {
+  const _addFriend = (receiver_id, is_friend, has_pending_request, index) => {
+    
     if (!is_friend && !has_pending_request) {
       fetch(base_url + 'api/friendrequests/', {
         method: 'POST',
@@ -36,6 +38,11 @@ function UserListScreen({ navigation }) {
       })
         .then(response => {
           if (response.ok) {
+            // Set user data and then trigger re-render
+            users[index].has_pending_request = true;
+            setUsers(users);
+            setSelectedUser(receiver_id);
+
             console.log("success");
           } else {
             console.log("Error");
@@ -88,28 +95,32 @@ function UserListScreen({ navigation }) {
 
       <FlatList
         data={users}
+        extraData={selectedUser}
         keyExtractor={(item, index) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item}>
-            <View style={{flex: 1, flexDirection: "row", justifyContent: "space-between"}}>
-              <View style={{ flex: 4 }}>
-                {item.first_name ? <Text style={styles.listTitle}>{item.first_name} {item.last_name}</Text> : null}
-                <Text style={styles.listTitle}>{item.email}</Text>
-              </View>
+        renderItem={({ item, index }) => {
 
-              <TouchableOpacity
-                style={{ flex: 1 }}
-                onPress={() => _addFriend(item.id, item.is_friend, item.has_pending_request)}
-              >
-                {
-                  item.is_friend ? <Ionicons name={"checkbox"} size={40} color={"white"} />
-                    : item.has_pending_request ? <Ionicons name={"mail-outline"} size={40} color={"white"} />
-                    : <Ionicons name={"person-add"} size={40} color={"white"} />
-                }
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        )}
+          const iconName = item.is_friend ? "checkbox"
+            : item.id === selectedUser || item.has_pending_request ? "mail-outline"
+            : "person-add";
+
+          return (
+            <TouchableOpacity style={styles.item}>
+              <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+                <View style={{ flex: 4 }}>
+                  {item.first_name ? <Text style={styles.listTitle}>{item.first_name} {item.last_name}</Text> : null}
+                  <Text style={styles.listTitle}>{item.email}</Text>
+                </View>
+
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={() => _addFriend(item.id, item.is_friend, item.has_pending_request, index)}
+                >
+                  <Ionicons name={iconName} size={40} color={"white"} />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
         initialNumToRender={8}
         onEndReachedThreshold={1}
         onEndReached={_handleGetMore}
