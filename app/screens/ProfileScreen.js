@@ -34,13 +34,8 @@ function ProfileScreen({ route, navigation }) {
         <Text style={styles.title}>{user.first_name || user.id}</Text>
       </View>
 
-
-      <TouchableOpacity style={styles.actionBtn}>
-        <Text style={styles.actionBtnText}>Friends</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate("UserList")}>
-        <Text style={styles.actionBtnText}>Add Friends</Text>
+        <Text style={styles.actionBtnText}>Friends</Text>
       </TouchableOpacity>
 
     </SafeAreaView>

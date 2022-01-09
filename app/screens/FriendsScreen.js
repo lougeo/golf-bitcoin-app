@@ -7,10 +7,12 @@ import { AuthContext } from '../providers/AuthContext';
 import { base_url } from "../Globals";
 
 
-function UserListScreen({ navigation }) {
+function FriendsScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
-  const [users, setUsers] = React.useState('');
+  const [users, setUsers] = React.useState([]);
+  const [friendRequests, setFriendRequests] = React.useState([]);
   const [selectedUser, setSelectedUser] = React.useState('');
+  const [selectedRequest, setSelectedRequest] = React.useState('');
   const [params, setParams] = React.useState({ search: '', page: '1', next: null });
 
   const _handleGetMore = () => {
@@ -21,7 +23,7 @@ function UserListScreen({ navigation }) {
 
   const _handleSearch = (input) => {
     setParams({ ...params, search: input, page: '1' });
-  }
+  };
 
   const _addFriend = (receiver_id, is_friend, has_pending_request, index) => {
     
@@ -38,12 +40,12 @@ function UserListScreen({ navigation }) {
       })
         .then(response => {
           if (response.ok) {
-            // Set user data and then trigger re-render
-            users[index].has_pending_request = true;
-            setUsers(users);
+            let new_users = users;
+            new_users[index].has_pending_request = true;
+            setUsers(new_users);
             setSelectedUser(receiver_id);
 
-            console.log("success");
+            console.log("Success");
           } else {
             console.log("Error");
           }
@@ -53,7 +55,61 @@ function UserListScreen({ navigation }) {
           console.error(error);
         });
     }
-  }
+  };
+
+  const _updateFriendRequest = (id, accepted, index) => {
+      fetch(base_url + 'api/friendrequests/' + id.toString() + '/', {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Token ' + userToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          accepted: accepted
+        })
+      })
+        .then(response => {
+          if (response.ok) {
+            let new_friendrequests = friendRequests;
+            new_friendrequests.splice(index, 1);
+            setFriendRequests(new_friendrequests);
+            setSelectedRequest(selectedRequest + 1);
+
+            console.log("Success");
+          } else {
+            console.log("Error");
+          }
+        })
+        .catch((error) => {
+          // Network error, server off or similar.
+          console.error(error);
+        });
+  };
+
+  React.useEffect(() => {
+    fetch(base_url + 'api/friendrequests/mine/', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + userToken
+      }
+    })
+      .then(response => response.ok ? response.json() : null)
+      .then(json => {
+        if (json) {
+          let new_friendrequests = friendRequests;
+          if (new_friendrequests) {
+            new_friendrequests.push(...json);
+          } else {
+            new_friendrequests = json;
+          }
+          setFriendRequests(new_friendrequests);
+        }
+      })
+      .catch((error) => {
+        // Network error, server off or similar.
+        console.error(error);
+      });
+  }, []); 
 
   React.useEffect(() => {
     fetch(base_url + 'api/users/?search=' + params.search + '&page=' + params.page, {
@@ -65,9 +121,8 @@ function UserListScreen({ navigation }) {
       .then(response => response.ok ? response.json() : null)
       .then(json => {
         if (json) {
-          console.log(json);
           let new_users = users;
-          if (users && parseInt(params.page) > 1) {
+          if (new_users && parseInt(params.page) > 1) {
             new_users.push(...json.results);
           } else {
             new_users = json.results;
@@ -84,6 +139,45 @@ function UserListScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.flcontainer}>
+
+      <View>
+        <FlatList
+          data={friendRequests}
+          extraData={selectedRequest}
+          keyExtractor={(item, index) => item.id}
+          renderItem={({ item, index }) => {
+            
+            return (
+              <TouchableOpacity style={styles.item}>
+                <View style={{ justifyContent: "flex-end" }}>
+                  <View>
+                    {item.sender_full.first_name ? <Text style={styles.listTitle}>{item.sender_full.first_name} {item.sender_full.last_name}</Text> : null}
+                    <Text style={styles.listTitle}>{item.sender_full.email}</Text>
+                  </View>
+
+                  <View style={{ flexDirection: "row", justifyContent: "space-evenly", borderTopWidth: 2, marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={{ flexDirection: "row", justifyContent: "center", borderRightWidth: 1, width:"50%", paddingTop: 5 }}
+                      onPress={() => _updateFriendRequest(item.id, false, index)}
+                    >
+                      <Text style={styles.listTitle}>Decline</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{ flexDirection: "row", justifyContent: "center", borderLeftWidth: 1, width:"50%", paddingTop: 5 }}
+                      onPress={() => _updateFriendRequest(item.id, true, index)}
+                    >
+                      <Text style={styles.listTitle}>Accept</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )
+          }}
+          initialNumToRender={8}
+          onEndReachedThreshold={1}
+          onEndReached={_handleGetMore}
+        />
+      </View>
       
       <SearchBar
         lightTheme="true"
@@ -188,4 +282,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default UserListScreen;
+export default FriendsScreen;
