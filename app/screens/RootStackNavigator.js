@@ -9,6 +9,7 @@ import SettingsScreen from "./SettingsScreen";
 const Tab = createBottomTabNavigator();
 
 function Root() {
+
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
       headerShown: false,
@@ -23,7 +24,6 @@ function Root() {
           iconName = focused ? 'settings' : 'settings-outline';
         }
 
-        // You can return any component that you like here!
         return <Ionicons name={iconName} size={size} color={color} />;
       },
       tabBarActiveTintColor: '#025b0e',
