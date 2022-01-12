@@ -9,7 +9,7 @@ import SelectionModal from "./modals/SelectionModal";
 
 function RoundCreateScreen({ navigation }) {
   const { userToken } = React.useContext(AuthContext);
-  const [modalParams, setModalParams] = React.useState({ visible: false, path: 'courses', search_param: 'name', qs_params: {}, setSelectedItem: null});
+  const [modalParams, setModalParams] = React.useState({ visible: false, path: '', search_param: '', qs_params: {}, setSelectedItem: null});
   const [selectedCourse, setSelectedCourse] = React.useState({});
   const [selectedScorecard, setSelectedScorecard] = React.useState({id: '', title: ''});
 

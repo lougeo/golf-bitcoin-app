@@ -39,17 +39,17 @@ function SelectionModal(props) {
     setModalParams({visible: !modalParams.visible, path: '', search_param: ''});
   }
 
-  React.useEffect(() => {
-    if (modalParams.path) {
+  const _fetchData = (state_params, api_params) => {
+    if (api_params.path) {
       // Build url
-      let url = base_url + 'api/' + modalParams.path + '/?page=' + params.page;
+      let url = base_url + 'api/' + api_params.path + '/?page=' + state_params.page;
 
-      if (modalParams.search_param) {
-        url = url + '&' + modalParams.search_param + '=' + params.search;
+      if (api_params.search_param) {
+        url = url + '&' + api_params.search_param + '=' + state_params.search;
       }
 
-      for (const obj in modalParams.qs_params) {
-        url = url + '&' + obj + '=' + modalParams.qs_params[obj];
+      for (const obj in api_params.qs_params) {
+        url = url + '&' + obj + '=' + api_params.qs_params[obj];
       }
       console.log("API");
       console.log(url);
@@ -64,21 +64,25 @@ function SelectionModal(props) {
         .then(json => {
           if (json) {
             let new_data = data;
-            if (data && parseInt(params.page) > 1) {
+            if (data && parseInt(state_params.page) > 1) {
               new_data.push(...json.results);
             } else {
               new_data = json.results;
             }
             setData(new_data);
-            setParams({ ...params, next: json.next });
+            setParams({ ...state_params, next: json.next });
           }
         })
         .catch((error) => {
           // Network error, server off or similar.
           console.error(error);
         });
-
     }
+
+  }
+
+  React.useEffect(() => {
+    _fetchData(params, modalParams)
   }, [params.search, params.page, props]);
 
 
@@ -106,7 +110,7 @@ function SelectionModal(props) {
 
       <FlatList
         data={data}
-        keyExtractor={(item, index) => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={mainStyles.listItem}
@@ -116,7 +120,7 @@ function SelectionModal(props) {
           </TouchableOpacity>
         )}
         initialNumToRender={8}
-        onEndReachedThreshold={1}
+        onEndReachedThreshold={3}
         onEndReached={_handleGetMore}
       />
 
@@ -142,3 +146,44 @@ const styles = StyleSheet.create({
 
 
 export default SelectionModal;
+
+
+
+    // if (modalParams.path) {
+    //   // Build url
+    //   let url = base_url + 'api/' + modalParams.path + '/?page=' + params.page;
+
+    //   if (modalParams.search_param) {
+    //     url = url + '&' + modalParams.search_param + '=' + params.search;
+    //   }
+
+    //   for (const obj in modalParams.qs_params) {
+    //     url = url + '&' + obj + '=' + modalParams.qs_params[obj];
+    //   }
+    //   console.log("API");
+    //   console.log(url);
+    //   // Hit api
+    //   fetch(url, {
+    //     method: 'GET',
+    //     headers: {
+    //       'Authorization': 'Token ' + userToken
+    //     }
+    //   })
+    //     .then(response => response.ok ? response.json() : null)
+    //     .then(json => {
+    //       if (json) {
+    //         let new_data = data;
+    //         if (data && parseInt(params.page) > 1) {
+    //           new_data.push(...json.results);
+    //         } else {
+    //           new_data = json.results;
+    //         }
+    //         setData(new_data);
+    //         setParams({ ...params, next: json.next });
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       // Network error, server off or similar.
+    //       console.error(error);
+    //     });
+    // }
