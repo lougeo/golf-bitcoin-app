@@ -39,6 +39,16 @@ function SelectionModal(props) {
     setModalParams({visible: !modalParams.visible, path: '', search_param: ''});
   }
 
+  const _getDisplayName = (item) => {
+    if (item.name) {
+      return item.name;
+    } else if (item.title) {
+      return item.title;
+    } else if ((item.first_name && item.last_name) || item.email) {
+      return item.first_name && item.last_name ? item.first_name + ' ' + item.last_name : item.email
+    }
+  }
+
   const _fetchData = (state_params, api_params) => {
     if (api_params.path) {
       // Build url
@@ -116,7 +126,7 @@ function SelectionModal(props) {
             style={mainStyles.listItem}
             onPress={() => _handleItemSelection(item)}
           >
-            <Text style={mainStyles.title}>{item.name ? item.name : item.title}</Text>
+            <Text style={mainStyles.title}>{_getDisplayName(item)}</Text>
           </TouchableOpacity>
         )}
         initialNumToRender={8}

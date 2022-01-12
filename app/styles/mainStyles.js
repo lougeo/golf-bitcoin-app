@@ -37,6 +37,15 @@ const mainStyles = StyleSheet.create({
     alignItems: "center",
   },
 
+  textInputView: {
+    backgroundColor: "#9db802",
+    borderRadius: 30,
+    width: "70%",
+    height: 45,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+
   textInput: {
     color: "white",
     flex: 1,
