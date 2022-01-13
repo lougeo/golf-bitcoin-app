@@ -1,9 +1,11 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, TouchableOpacity, TextInput, View, Text, Alert } from "react-native";
+import { StyleSheet, TouchableOpacity, TextInput, View, Text, Alert, FlatList } from "react-native";
 import { AuthContext } from '../providers/AuthContext';
+import { base_url } from "../Globals";
 import { mainStyles } from "../styles/mainStyles";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 import SelectionModal from "./modals/SelectionModal";
 
@@ -27,57 +29,48 @@ function RoundCreateMetaScreen({ navigation, route }) {
     setShow(!show);
     setTeetime(currentDate);
   }
+
+  const _handleUserSelection = (value) => {
+    console.log(value);
+
+    let existing_users = selectedUsers;
+    console.log(existing_users);
+    existing_users.push(value);
+
+    console.log(existing_users);
+    setSelectedUsers(existing_users);
+  }
+
+  const _removeFriend = (id) => {
+    let existing_users = selectedUsers;
+    existing_users = existing_users.filter((obj) => obj.id !== id);
+    setSelectedUsers(existing_users);
+  }
   
   const _handleSubmit = () => {
     if (teetime) {
-      fetch(base_url + 'api/rounds/' + route.params.id + '/', {
-        method: 'POST',
+      fetch(base_url + 'api/rounds/' + route.params.round_id + '/', {
+        method: 'PUT',
         headers: {
           'Authorization': 'Token ' + userToken,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           tee_time: teetime,
-          users: selectedUsers,
+          set_users: selectedUsers.map(({ id }) => id),
           title: title,
           description: description
         })
       })
-        .then(response => response.json())
-        .then(json => {
-
-          if ('users' in json) {
-            Alert.alert(
-              "Users Error",
-              "Fuck u bitch",
-              [{ text: "OK", onPress: () => console.log("OK Pressed") }
-              ]
-            );
-          } else if ('tee_time' in json) {
-            Alert.alert(
-              "Tee Time Error",
-              "Fuck u bitch",
-              [{ text: "OK", onPress: () => console.log("OK Pressed") }
-              ]
-            );
-          } else if ('title' in json) {
-            Alert.alert(
-              "Title Error",
-              "Fuck u bitch",
-              [{ text: "OK", onPress: () => console.log("OK Pressed") }
-              ]
-            );
-          } else if ('description' in json) {
-            Alert.alert(
-              "Description Error",
-              "Fuck u bitch",
-              [{ text: "OK", onPress: () => console.log("OK Pressed") }
-              ]
-            );
+        .then(response => response.json().then(json => {
+          if (response.ok) {
+            console.log("SUCCESS");
+            navigation.navigate("RoundMain")
           } else {
-            navigation.navigate()
+            console.log("VALIDATION ERROR");
           }
         })
+        )
         .catch((error) => {
           // Network error, server off or similar.
           console.error(error);
@@ -111,6 +104,7 @@ function RoundCreateMetaScreen({ navigation, route }) {
       <TouchableOpacity style={mainStyles.actionBtn} onPress={_showTeeTime}>
           <Text style={mainStyles.actionBtnText}>Tee Time</Text>
       </TouchableOpacity>
+      <Text>{teetime.toString()}</Text>
 
       {show && (
         <DateTimePicker
@@ -121,13 +115,35 @@ function RoundCreateMetaScreen({ navigation, route }) {
           onChange={_handleDatePicker}
         />
       )}
-
-      <Text>{selectedUsers.id}</Text>
+      
       <TouchableOpacity
-        style={selectedUsers ? mainStyles.listItem : mainStyles.actionBtn }
-        onPress={() => setModalParams({ visible: true, path: 'users', search_param: 'search', setSelectedItem: setSelectedUsers })}>
-        <Text style={selectedUsers ? mainStyles.title : mainStyles.actionBtnText } >{selectedUsers.name || 'ADD FRIENDS'}</Text>
+        style={mainStyles.actionBtn}
+        onPress={() => setModalParams({
+          visible: true, path: 'users', search_param: 'search', qs_params: { 'selected-users': selectedUsers.map(({ id }) => id) }, setSelectedItem: _handleUserSelection
+        })}>
+        <Text style={mainStyles.actionBtnText} >ADD FRIENDS</Text>
       </TouchableOpacity>
+      
+      <FlatList
+        data={selectedUsers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={[mainStyles.listItem]}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <View style={{ }}>
+                <Text style={mainStyles.title}>{item.id} {item.email}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={{ }}
+                onPress={() => _removeFriend(item.id)}
+              >
+                <Ionicons name={'remove'} size={40} color={"white"} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
       
       <TouchableOpacity style={mainStyles.actionBtn} onPress={_handleSubmit}>
           <Text style={mainStyles.actionBtnText}>NEXT</Text>

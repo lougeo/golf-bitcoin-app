@@ -58,8 +58,12 @@ function SelectionModal(props) {
         url = url + '&' + api_params.search_param + '=' + state_params.search;
       }
 
-      for (const obj in api_params.qs_params) {
-        url = url + '&' + obj + '=' + api_params.qs_params[obj];
+      for (const key in api_params.qs_params) {
+        const value = api_params.qs_params[key]
+        if (value && !((typeof(value) === 'string') || (typeof(value) === 'number'))) {
+          value = JSON.stringify(value);
+        } 
+        url = url + '&' + key + '=' + value;
       }
       console.log("API");
       console.log(url);
