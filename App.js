@@ -13,6 +13,7 @@ import CourseDetailScreen from './app/screens/CourseDetailScreen';
 import FriendsScreen from './app/screens/FriendsScreen';
 import RoundCreateScreen from './app/screens/RoundCreateScreen';
 import RoundCreateMetaScreen from './app/screens/RoundCreateMetaScreen';
+import RoundMainScreen from './app/screens/RoundMainScreen';
 
 import { AuthContext } from './app/providers/AuthContext';
 import authSwitch, { initialState, ACTIONS } from './app/hooks/authSwitch';
@@ -238,6 +239,7 @@ export default function App() {
                 <Stack.Screen name="UserList" component={FriendsScreen} />
                 <Stack.Screen name="RoundCreate" component={RoundCreateScreen} />
                 <Stack.Screen name="RoundCreateMeta" component={RoundCreateMetaScreen} />
+                <Stack.Screen name="RoundMain" component={RoundMainScreen} />
               </>
             )}
           </Stack.Navigator>
