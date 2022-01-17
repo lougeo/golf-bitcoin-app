@@ -27,6 +27,11 @@ const mainStyles = StyleSheet.create({
     fontSize: 32,
   },
 
+  subtitle: {
+    fontSize: 28,
+    marginVertical: 15,
+  },
+
   inputView: {
     backgroundColor: secondaryColor,
     borderRadius: 30,
@@ -50,18 +55,33 @@ const mainStyles = StyleSheet.create({
     color: "white",
     flex: 1,
   },
- 
+
+  addBtnWrap: {
+    // alignSelf: "flex-end",
+    // position: "absolute",
+    // bottom: 150,
+    // right: 10,
+    flexDirection: 'row',
+    // flex: 2,
+    // alignItems: 'baseline',
+    justifyContent: 'center',
+  },
+
   addBtn: {
-    alignSelf: "flex-end",
-    position: "absolute",
-    bottom: 0,
-    right: 10,
-    height: 100,
-    width: 100,
-    borderRadius: 50,
+    width: "50%",
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: primaryColor,
+    backgroundColor: "#025b0e",
+  },
+
+  addBtnDanger: {
+    width: "50%",
+    // borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "red",
   },
 
   actionBtnText: {
@@ -76,6 +96,18 @@ const mainStyles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 40,
     backgroundColor: primaryColor,
+  },
+
+  tableCell: {
+    width: 150,
+  },
+
+  tableHeader: {
+    fontSize: 20,
+  },
+
+  tableData: {
+    fontSize: 20,
   },
   
 });

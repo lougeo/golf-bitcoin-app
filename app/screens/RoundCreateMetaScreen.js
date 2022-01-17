@@ -31,13 +31,8 @@ function RoundCreateMetaScreen({ navigation, route }) {
   }
 
   const _handleUserSelection = (value) => {
-    console.log(value);
-
     let existing_users = selectedUsers;
-    console.log(existing_users);
     existing_users.push(value);
-
-    console.log(existing_users);
     setSelectedUsers(existing_users);
   }
 
@@ -64,8 +59,7 @@ function RoundCreateMetaScreen({ navigation, route }) {
       })
         .then(response => response.json().then(json => {
           if (response.ok) {
-            console.log("SUCCESS");
-            navigation.navigate("RoundMain")
+            navigation.navigate("RoundMain", {"round_details": json})
           } else {
             console.log("VALIDATION ERROR");
           }
@@ -131,7 +125,7 @@ function RoundCreateMetaScreen({ navigation, route }) {
           <View style={[mainStyles.listItem]}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <View style={{ }}>
-                <Text style={mainStyles.title}>{item.id} {item.email}</Text>
+                <Text style={mainStyles.title}>{item.first_name ? item.first_name + ' ' + item.last_name : item.email}</Text>
               </View>
 
               <TouchableOpacity
