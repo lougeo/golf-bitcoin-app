@@ -8,11 +8,30 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 function RoundMainScreen({ navigation, route }) {
   const { userToken } = React.useContext(AuthContext);
+  const [scores, setScores] = React.useState({}); // format: {hole number <int>: {user id <str>: score <int>, ...}
 
   const round = route.params.round_details;
-  console.log("HHHHHEEEEEERRRRRRREEEEEEEE");
   console.log(round);
 
+  const _renderTable = (data) => {
+    return <View>
+      <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.number}</Text></View>
+      <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.par}</Text></View>
+      <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.distance}</Text></View>
+      <View style={[mainStyles.tableCell, {borderBottomWidth:4, borderBottomColor:"black"}]}><Text style={mainStyles.tableData}>{data.handicap}</Text></View>
+      {round.users.map((user) => (
+        <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>
+          {
+            data.number in scores ?
+              user.id in scores[data.number] ?
+                scores[data.number][user.id]
+                : ''
+              : ''
+          }
+        </Text></View>
+      ))}
+    </View>
+  }
 
   return (
     <SafeAreaView style={mainStyles.flcontainer}>
@@ -32,16 +51,12 @@ function RoundMainScreen({ navigation, route }) {
             <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>Hole</Text></View>
             <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>Par</Text></View>
             <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>Distance</Text></View>
-            <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>Handicap</Text></View>
+            <View style={[mainStyles.tableCell, { borderBottomWidth: 4, borderBottomColor: "black" }]}><Text style={mainStyles.tableHeader}>Handicap</Text></View>
+            {round.users.map((data) => (
+              <View style={mainStyles.tableCell}><Text style={mainStyles.tableHeader}>{data.first_name}</Text></View>
+            ))}
           </View>
-          {round.scorecard.scorecard_holes.map((data) => (
-            <View>
-              <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.number}</Text></View>
-              <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.par}</Text></View>
-              <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.distance}</Text></View>
-              <View style={mainStyles.tableCell}><Text style={mainStyles.tableData}>{data.handicap}</Text></View>
-            </View>
-          ))}
+          {round.scorecard.scorecard_holes.map(_renderTable)}
         </ScrollView>
       </View>
 
