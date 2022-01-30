@@ -5,9 +5,13 @@ import { AuthContext } from '../providers/AuthContext';
 import { base_url } from "../Globals";
 import { mainStyles } from "../styles/mainStyles";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import ScoreInputModal from "./modals/ScoreInputModal";
 
 function RoundMainScreen({ navigation, route }) {
   const { userToken } = React.useContext(AuthContext);
+  const [modalParams, setModalParams] = React.useState({ visible: false, setScores: null });
+  // Need to create the score objects upon round creation, and then have those returned to loop over.
+  // Then the score state can be updated upon mount.
   const [scores, setScores] = React.useState({}); // format: {hole number <int>: {user id <str>: score <int>, ...}
 
   const round = route.params.round_details;
@@ -35,6 +39,8 @@ function RoundMainScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={mainStyles.flcontainer}>
+
+      <ScoreInputModal modalParams={modalParams} setModalParams={setModalParams} />
 
       <View style={styles.titleWrap}>
         <Text style={[mainStyles.title, {marginVertical: 25}]}>{round.title ? round.title : ''}</Text>
@@ -65,9 +71,11 @@ function RoundMainScreen({ navigation, route }) {
           <Text style={mainStyles.actionBtnText}>PREV</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={mainStyles.addBtn}>
+        <TouchableOpacity
+          style={mainStyles.addBtn}
+          onPress={() => setModalParams({ visible: true, setScores: setScores })}>
           <Text style={mainStyles.actionBtnText}>NEXT</Text>
-        </TouchableOpacity>            
+        </TouchableOpacity>
       </View>
           
     </SafeAreaView>
